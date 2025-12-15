@@ -1,1 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juego para Darenka 💖</title>
 
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+}
+.card{
+  width:min(780px,94vw);
+  background: rgba(255,255,255,.95);
+  border-radius:22px;
+  padding:28px;
+  text-align:center;
+  box-shadow:0 12px 35px rgba(0,0,0,.18);
+  position:relative;
+  overflow:hidden;
+}
+h1{margin:0 0 10px;font-size:34px}
+p{font-size:18px}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+button{
+  border:0;border-radius:14px;padding:14px 20px;
+  font-size:16px;font-weight:800;cursor:pointer;
+  box-shadow:0 8px 18px rgba(0,0,0,.16);
+}
+.primary{background:#111;color:#fff}
+.ghost{background:#fff;color:#111}
+.final{font-size:36px}
+
+.heart{
+  position:absolute;bottom:-20px;font-size:24px;
+  animation: floatUp 3s ease forwards;pointer-events:none;
+}
+@keyframes floatUp{
+  0%{transform:translateY(0) scale(.8);opacity:0}
+  20%{opacity:1}
+  100%{transform:translateY(-520px) scale(1.6);opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+  <h1 id="title">Hola Darenka 😊</h1>
+  <p id="text">Antes de la sorpresa… ¿jugamos un poquito?</p>
+
+  <div class="btns" id="btns">
+    <button class="primary" id="musicBtn">Activar música 💗</button>
+    <button class="ghost" onclick="render(0)">Empezar 🎮</button>
+  </div>
+
+  <audio id="bgm" src="music.mp3" loop preload="auto" playsinline></audio>
+</div>
+
+<script>
+const title = document.getElementById("title");
+const text  = document.getElementById("text");
+const btns  = document.getElementById("btns");
+const card  = document.getElementById("card");
+const bgm   = document.getElementById("bgm");
+
+/* 🔓 Desbloqueo audio */
+let audioUnlocked=false;
+function unlockAudio(){
+  if(audioUnlocked) return;
+  bgm.play().then(()=>{
+    bgm.pause(); bgm.currentTime=0; audioUnlocked=true;
+  }).catch(()=>{});
+}
+document.addEventListener("click", unlockAudio,{once:true});
+document.addEventListener("touchstart", unlockAudio,{once:true});
+
+/* 💖 corazones */
+function hearts(){
+  for(let i=0;i<10;i++){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.textContent=["💖","💗","💘","💞"][Math.floor(Math.random()*4)];
+    h.style.left=(10+Math.random()*80)+"%";
+    h.style.fontSize=(18+Math.random()*18)+"px";
+    card.appendChild(h);
+    setTimeout(()=>h.remove(),3000);
+  }
+}
+
+/* 🎮 niveles + trivia */
+const steps=[
+  {
+    t:"Nivel 1 💕",
+    p:"Elige una puerta:",
+    buttons:[
+      {txt:"Puerta A 🚪", next:1},
+      {txt:"Puerta B 🚪", next:1}
+    ]
+  },
+  {
+    t:"Nivel 2 ✨",
+    p:"¿Qué plan te gusta más?",
+    buttons:[
+      {txt:"Café ☕", next:2},
+      {txt:"Helado 🍦", next:2},
+      {txt:"Cine 🎬", next:2}
+    ]
+  },
+  {
+    t:"Trivia Deftones 🎶",
+    p:"¿Quién es el vocalista de Deftones?",
+    buttons:[
+      {txt:"Chino Moreno 🖤", next:3},
+      {txt:"El de la voz hermosa 😌", next:3}
+    ]
+  },
+  {
+    t:"Trivia Deftones 🎧",
+    p:"¿Cuál de estos álbumes es de Deftones?",
+    buttons:[
+      {txt:"White Pony 🤍🐎", next:4},
+      {txt:"El que escuchamos fuerte 🔊", next:4}
+    ]
+  },
+  {
+    t:"Trivia final 🖤",
+    p:"¿Cómo se siente escuchar Deftones?",
+    buttons:[
+      {txt:"Intenso 😌", next:5},
+      {txt:"Emocional 🖤", next:5},
+      {txt:"Todo eso ✨", next:5}
+    ]
+  },
+  {
+    t:"Último nivel 😳",
+    p:"Ok… respira un segundo",
+    buttons:[
+      {txt:"Continuar 💕", next:6}
+    ]
+  },
+  {
+    t:"💖",
+    p:"Darenka, ¿quieres ser mi novia?",
+    final:true
+  }
+];
+
+/* render */
+function render(i){
+  const s=steps[i];
+  title.textContent=s.t;
+  btns.innerHTML="";
+
+  if(s.final){
+    text.innerHTML=`<div class="final">${s.p}</div>`;
+    const yes=document.createElement("button");
+    yes.className="primary";
+    yes.textContent="Sí 💕";
+    yes.onclick=()=>{hearts(); alert("💖 Sabía que dirías que sí 💖");};
+
+    const no=document.createElement("button");
+    no.className="ghost";
+    no.textContent="No 🙈";
+    no.onmouseover=()=>{
+      no.style.transform="translate("+(Math.random()*140-70)+"px)";
+    };
+
+    btns.appendChild(yes);
+    btns.appendChild(no);
+    hearts();
+    return;
+  }
+
+  text.textContent=s.p;
+
+  const music=document.createElement("button");
+  music.className="ghost";
+  music.textContent=bgm.paused?"🔊 Música ON":"🔇 Música OFF";
+  music.onclick=()=>{bgm.paused?bgm.play():bgm.pause(); render(i);}
+  btns.appendChild(music);
+
+  s.buttons.forEach(b=>{
+    const btn=document.createElement("button");
+    btn.className="primary";
+    btn.textContent=b.txt;
+    btn.onclick=()=>{hearts(); render(b.next);}
+    btns.appendChild(btn);
+  });
+}
+
+/* botón música */
+document.getElementById("musicBtn").onclick=async()=>{
+  if(!audioUnlocked){
+    alert("Toca una vez la pantalla y vuelve a presionar 💗");
+    return;
+  }
+  bgm.currentTime=0;
+  await bgm.play();
+  hearts();
+};
+</script>
+
+</body>
+</html>
