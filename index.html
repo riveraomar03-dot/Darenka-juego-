@@ -1,1 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Juego para Darenka 💖</title>
+  <style>
+    body{
+      margin:0; min-height:100vh; display:grid; place-items:center;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+    }
+    .card{
+      width:min(760px,92vw);
+      background: rgba(255,255,255,.92);
+      border-radius: 22px;
+      padding: 28px;
+      text-align:center;
+      box-shadow: 0 12px 35px rgba(0,0,0,.18);
+      position:relative;
+      overflow:hidden;
+    }
+    h1{margin:0 0 10px; font-size:34px}
+    p{margin:10px 0; font-size:18px; line-height:1.35}
+    .btns{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+    button{
+      border:0; border-radius:14px; padding:14px 18px;
+      font-size:16px; font-weight:800; cursor:pointer;
+      box-shadow:0 8px 18px rgba(0,0,0,.16);
+      transition: transform .08s ease;
+    }
+    button:active{transform:scale(.98)}
+    .primary{background:#111;color:#fff}
+    .ghost{background:#fff;color:#111}
+    .final{font-size:38px;margin-top:8px}
+    .hint{font-size:13px;opacity:.7;margin-top:10px}
+    .heart{
+      position:absolute; bottom:-20px;
+      font-size:24px; pointer-events:none;
+      animation: floatUp 2.8s ease forwards;
+    }
+    @keyframes floatUp{
+      0%{transform:translateY(0) scale(.85); opacity:0}
+      20%{opacity:1}
+      100%{transform:translateY(-520px) scale(1.55); opacity:0}
+    }
+  </style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <h1 id="title">Hola Darenka 😊</h1>
+  <p id="text">Antes de la sorpresa… ¿jugamos un poquito?</p>
+
+  <div class="btns" id="btns">
+    <button class="primary" id="musicBtn">Activar música 💗</button>
+    <button class="ghost" id="startBtn">Empezar 🎮</button>
+  </div>
+
+  <!-- Pon tu canción en la raíz del repo con este nombre -->
+  <audio id="bgm" src="music.mp3" loop></audio>
+</div>
+
+<script>
+  const title = document.getElementById("title");
+  const text  = document.getElementById("text");
+  const btns  = document.getElementById("btns");
+  const card  = document.getElementById("card");
+  const bgm   = document.getElementById("bgm");
+
+  const steps = [
+    {
+      t:"Nivel 1 💕",
+      p:"Elige una puerta:",
+      options:["Puerta A 🚪","Puerta B 🚪"]
+    },
+    {
+      t:"Nivel 2 ✨",
+      p:"¿Qué plan te gusta más?",
+      options:["Café ☕","Helado 🍦","Cine 🎬"]
+    },
+    {
+      t:"Nivel 3 😳",
+      p:"Última pregunta… ¿te gustan las sorpresas?",
+      options:["Sí 💗","Obvio 😌"]
+    },
+    {
+      t:"Casi…",
+      p:"Ok… respira 😌",
+      options:["Ver la sorpresa 💘"]
+    },
+    {
+      t:"💖",
+      p:"Darenka, ¿quieres ser mi novia?",
+      final:true,
+      options:["Reiniciar 🔁"]
+    }
+  ];
+
+  function hearts(){
+    for(let i=0;i<9;i++){
+      const h=document.createElement("div");
+      h.className="heart";
+      h.textContent=["💖","💗","💘","💝","💞"][Math.floor(Math.random()*5)];
+      h.style.left=(10+Math.random()*80)+"%";
+      h.style.fontSize=(18+Math.random()*18)+"px";
+      card.appendChild(h);
+      setTimeout(()=>h.remove(), 3000);
+    }
+  }
+
+  function render(i){
+    const s=steps[i];
+    title.textContent = s.t;
+
+    if(s.final){
+      text.innerHTML = `<div class="final">${s.p}</div><div class="hint">💌 Puedes tomar captura aquí</div>`;
+      hearts();
+    } else {
+      text.textContent = s.p;
+    }
+
+    btns.innerHTML = "";
+
+    // Botón música (toggle)
+    const m = document.createElement("button");
+    m.className="ghost";
+    m.textContent = bgm.paused ? "🔊 Música ON" : "🔇 Música OFF";
+    m.onclick = async ()=>{
+      if(bgm.paused){ await bgm.play(); hearts(); }
+      else bgm.pause();
+      render(i);
+    };
+    btns.appendChild(m);
+
+    s.options.forEach(()=>{
+      const b=document.createElement("button");
+      b.className="primary";
+      b.textContent = (i===steps.length-1) ? "Reiniciar 🔁" : "Continuar 💕";
+      b.onclick = ()=>{
+        hearts();
+        if(i===steps.length-1) location.reload();
+        else render(i+1);
+      };
+      btns.appendChild(b);
+    });
+  }
+
+  document.getElementById("musicBtn").onclick = async ()=>{
+    await bgm.play();
+    hearts();
+  };
+
+  document.getElementById("startBtn").onclick = ()=>{
+    hearts();
+    render(0);
+  };
+</script>
+
+</body>
+</html>
 
