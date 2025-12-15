@@ -72,14 +72,8 @@ button{
     <button class="ghost" onclick="render(0)">Empezar 🎮</button>
   </div>
 
-  <!-- AUDIO (configurado para móviles y GitHub Pages) -->
-  <audio
-    id="bgm"
-    src="music.mp3"
-    loop
-    preload="auto"
-    playsinline
-  ></audio>
+  <!-- AUDIO -->
+  <audio id="bgm" src="music.mp3" loop preload="auto" playsinline></audio>
 </div>
 
 <script>
@@ -89,7 +83,34 @@ const btns  = document.getElementById("btns");
 const card  = document.getElementById("card");
 const bgm   = document.getElementById("bgm");
 
-// corazones
+/* =========================
+   🔓 DESBLOQUEO DE AUDIO
+   ========================= */
+let audioUnlocked = false;
+
+function unlockAudio(){
+  if(audioUnlocked) return;
+
+  bgm.muted = false;
+  bgm.volume = 1.0;
+
+  bgm.play().then(()=>{
+    bgm.pause();
+    bgm.currentTime = 0;
+    audioUnlocked = true;
+    console.log("Audio desbloqueado ✅");
+  }).catch(()=>{
+    console.log("Esperando interacción válida…");
+  });
+}
+
+// Cualquier interacción real desbloquea audio
+document.addEventListener("click", unlockAudio, { once:true });
+document.addEventListener("touchstart", unlockAudio, { once:true });
+
+/* =========================
+   💖 CORAZONES
+   ========================= */
 function hearts(){
   for(let i=0;i<10;i++){
     const h=document.createElement("div");
@@ -102,7 +123,9 @@ function hearts(){
   }
 }
 
-// pasos del juego
+/* =========================
+   🎮 JUEGO
+   ========================= */
 const steps=[
   {
     t:"Nivel 1 💕",
@@ -136,7 +159,6 @@ const steps=[
   }
 ];
 
-// render de pantallas
 function render(i){
   const s=steps[i];
   title.textContent=s.t;
@@ -152,8 +174,8 @@ function render(i){
     const no=document.createElement("button");
     no.className="ghost";
     no.textContent="No 🙈";
-    no.onmouseover=()=> {
-      no.style.transform =
+    no.onmouseover=()=>{
+      no.style.transform=
         "translate("+(Math.random()*140-70)+"px,"+
         (Math.random()*40-20)+"px)";
     };
@@ -166,19 +188,15 @@ function render(i){
 
   text.textContent=s.p;
 
-  // botón música ON/OFF
-  const musicToggle=document.createElement("button");
-  musicToggle.className="ghost";
-  musicToggle.textContent=bgm.paused?"🔊 Música ON":"🔇 Música OFF";
-  musicToggle.onclick=()=>{
-    if(bgm.paused){
-      bgm.play();
-    } else {
-      bgm.pause();
-    }
+  // Música ON / OFF
+  const toggle=document.createElement("button");
+  toggle.className="ghost";
+  toggle.textContent=bgm.paused?"🔊 Música ON":"🔇 Música OFF";
+  toggle.onclick=()=>{
+    bgm.paused?bgm.play():bgm.pause();
     render(i);
   };
-  btns.appendChild(musicToggle);
+  btns.appendChild(toggle);
 
   s.buttons.forEach(b=>{
     const btn=document.createElement("button");
@@ -189,19 +207,20 @@ function render(i){
   });
 }
 
-// BOTÓN PRINCIPAL DE MÚSICA (ANTI-BLOQUEO)
-document.getElementById("musicBtn").onclick = async () => {
-  try {
+/* =========================
+   🎵 BOTÓN PRINCIPAL
+   ========================= */
+document.getElementById("musicBtn").onclick = async ()=>{
+  if(!audioUnlocked){
+    alert("Toca una vez la pantalla y vuelve a presionar 💗");
+    return;
+  }
+  try{
     bgm.currentTime = 0;
-    bgm.muted = false;
-    bgm.volume = 1.0;
     await bgm.play();
     hearts();
-  } catch (e) {
-    alert(
-      "⚠️ El navegador bloqueó la música.\n" +
-      "Toca cualquier parte de la pantalla y vuelve a presionar 'Activar música 💗'."
-    );
+  }catch(e){
+    alert("Sube el volumen o revisa que la pestaña no esté en silencio 🔊");
   }
 };
 </script>
