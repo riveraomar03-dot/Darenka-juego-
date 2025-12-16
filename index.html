@@ -6,63 +6,60 @@
 <title>Juego para Darenka 💖</title>
 
 <style>
-body{
-  margin:0; min-height:100vh; display:grid; place-items:center;
-  font-family: Arial, Helvetica, sans-serif;
-  background: linear-gradient(135deg,#ff9a9e,#fad0c4);
-}
-.card{
-  width:min(860px,96vw);
-  background: rgba(255,255,255,.96);
-  border-radius:22px;
-  padding:28px;
-  text-align:center;
-  box-shadow:0 12px 35px rgba(0,0,0,.18);
-  position:relative; overflow:hidden;
-}
-h1{margin:0 0 10px;font-size:34px}
-p{font-size:18px; line-height:1.4}
-.small{font-size:14px; opacity:.7}
-.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
-button{
-  border:0;border-radius:14px;padding:14px 20px;
-  font-size:16px;font-weight:800;cursor:pointer;
-  box-shadow:0 8px 18px rgba(0,0,0,.16);
-}
-.primary{background:#111;color:#fff}
-.ghost{background:#fff;color:#111}
-.final{font-size:36px;margin-top:10px}
-.message{
-  text-align:left;
-  background:rgba(0,0,0,.05);
-  padding:18px;
-  border-radius:16px;
-  margin-top:18px;
-}
-.message p{font-size:17px}
-.signature{margin-top:12px;font-weight:800}
-
-.heart{
-  position:absolute;bottom:-20px;font-size:24px;
-  animation: floatUp 3.4s ease forwards;pointer-events:none;
-}
-@keyframes floatUp{
-  0%{transform:translateY(0) scale(.8);opacity:0}
-  15%{opacity:1}
-  100%{transform:translateY(-600px) scale(1.8);opacity:0}
-}
+  body{
+    margin:0; min-height:100vh; display:grid; place-items:center;
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+  }
+  .card{
+    width:min(860px,96vw);
+    background: rgba(255,255,255,.96);
+    border-radius:22px;
+    padding:28px;
+    text-align:center;
+    box-shadow:0 12px 35px rgba(0,0,0,.18);
+    position:relative; overflow:hidden;
+  }
+  h1{margin:0 0 10px;font-size:34px}
+  p{font-size:18px; line-height:1.4}
+  .small{font-size:14px; opacity:.7}
+  .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+  button{
+    border:0;border-radius:14px;padding:14px 20px;
+    font-size:16px;font-weight:800;cursor:pointer;
+    box-shadow:0 8px 18px rgba(0,0,0,.16);
+  }
+  .primary{background:#111;color:#fff}
+  .ghost{background:#fff;color:#111}
+  .final{font-size:36px;margin-top:10px}
+  .message{
+    text-align:left;
+    background:rgba(0,0,0,.05);
+    padding:18px;
+    border-radius:16px;
+    margin-top:18px;
+  }
+  .message p{font-size:17px; margin:10px 0}
+  .heart{
+    position:absolute;bottom:-20px;font-size:24px;
+    animation: floatUp 3.4s ease forwards;pointer-events:none;
+  }
+  @keyframes floatUp{
+    0%{transform:translateY(0) scale(.8);opacity:0}
+    15%{opacity:1}
+    100%{transform:translateY(-600px) scale(1.8);opacity:0}
+  }
 </style>
 </head>
 
 <body>
-
 <div class="card" id="card">
   <h1 id="title">Hola Darenka 😊</h1>
   <p id="text">Antes de la sorpresa… ¿jugamos un poquito?</p>
 
   <div class="btns" id="btns">
     <button class="primary" id="musicBtn">Activar música 💗</button>
-    <button class="ghost" onclick="go(0)">Empezar 🎮</button>
+    <button class="ghost" id="startBtn">Empezar 🎮</button>
   </div>
 
   <p class="small" id="hint">Tip: toca una vez la pantalla y luego activa la música 💗</p>
@@ -71,94 +68,159 @@ button{
 </div>
 
 <script>
-const card=document.getElementById("card");
-const title=document.getElementById("title");
-const text=document.getElementById("text");
-const btns=document.getElementById("btns");
-const hint=document.getElementById("hint");
-const bgm=document.getElementById("bgm");
+  const card = document.getElementById("card");
+  const title = document.getElementById("title");
+  const text  = document.getElementById("text");
+  const btns  = document.getElementById("btns");
+  const hint  = document.getElementById("hint");
+  const bgm   = document.getElementById("bgm");
 
-/* 🔓 Desbloqueo de audio */
-let audioUnlocked=false;
-function unlockAudio(){
-  if(audioUnlocked) return;
-  bgm.play().then(()=>{
-    bgm.pause(); bgm.currentTime=0; audioUnlocked=true;
-  }).catch(()=>{});
-}
-document.addEventListener("click", unlockAudio,{once:true});
-document.addEventListener("touchstart", unlockAudio,{once:true});
-
-/* 💖 Corazones */
-function hearts(n=18){
-  for(let i=0;i<n;i++){
-    const h=document.createElement("div");
-    h.className="heart";
-    h.textContent=["💖","💗","💘","💝","💞"][Math.floor(Math.random()*5)];
-    h.style.left=(6+Math.random()*88)+"%";
-    h.style.fontSize=(18+Math.random()*22)+"px";
-    card.appendChild(h);
-    setTimeout(()=>h.remove(),3600);
+  // 🔓 desbloqueo de audio
+  let audioUnlocked = false;
+  function unlockAudio(){
+    if (audioUnlocked) return;
+    bgm.muted = false;
+    bgm.volume = 1.0;
+    bgm.play().then(()=>{
+      bgm.pause();
+      bgm.currentTime = 0;
+      audioUnlocked = true;
+    }).catch(()=>{});
   }
-}
+  document.addEventListener("click", unlockAudio, { once:true });
+  document.addEventListener("touchstart", unlockAudio, { once:true });
 
-/* 🎮 Flujo del juego */
-const steps=[
-  {t:"Nivel 1 💕", p:"Elige una puerta:", c:[
-    {t:"Puerta A 🚪", n:1},{t:"Puerta B 🚪", n:1}
-  ]},
-  {t:"Nivel 2 ✨", p:"Elige un plan:", c:[
-    {t:"Café ☕", n:2},{t:"Helado 🍦", n:2},{t:"Cine 🎬", n:2}
-  ]},
-  {t:"Trivia Deftones 🎶", p:"¿Quién es el vocalista de Deftones?", c:[
-    {t:"Chino Moreno 🖤", n:3},{t:"El de la voz intensa 😮‍💨", n:3}
-  ]},
-  {t:"Trivia Deftones 🎧", p:"¿Cuál de estos álbumes es de Deftones?", c:[
-    {t:"White Pony 🤍🐎", n:4},{t:"El que se siente como abrazo 🌧️", n:4}
-  ]},
-  {t:"Misión romántica 💞", p:"Completa la frase: Contigo, lo simple se siente…", c:[
-    {t:"Especial ✨", n:5},{t:"Seguro 🫶", n:5},{t:"Como hogar 🏡", n:5}
-  ]},
-  {t:"💖", final:true}
-];
+  // 💖 corazones
+  function hearts(n=18){
+    for(let i=0;i<n;i++){
+      const h=document.createElement("div");
+      h.className="heart";
+      h.textContent=["💖","💗","💘","💝","💞"][Math.floor(Math.random()*5)];
+      h.style.left=(6+Math.random()*88)+"%";
+      h.style.fontSize=(18+Math.random()*22)+"px";
+      card.appendChild(h);
+      setTimeout(()=>h.remove(),3600);
+    }
+  }
 
-function musicToggle(i){
-  const b=document.createElement("button");
-  b.className="ghost";
-  b.textContent=bgm.paused?"🔊 Música ON":"🔇 Música OFF";
-  b.onclick=()=>{bgm.paused?bgm.play():bgm.pause(); go(i);};
-  return b;
-}
+  // 🎮 pasos
+  const steps = [
+    { t:"Nivel 1 💕", p:"Elige una puerta:", c:[
+      { t:"Puerta A 🚪", n:1 }, { t:"Puerta B 🚪", n:1 }
+    ]},
+    { t:"Nivel 2 ✨", p:"Elige un plan:", c:[
+      { t:"Café ☕", n:2 }, { t:"Helado 🍦", n:2 }, { t:"Cine 🎬", n:2 }
+    ]},
+    { t:"Trivia Deftones 🎶", p:"¿Quién es el vocalista de Deftones?", c:[
+      { t:"Chino Moreno 🖤", n:3 }, { t:"El de la voz intensa 😮‍💨", n:3 }
+    ]},
+    { t:"Trivia Deftones 🎧", p:"¿Cuál de estos álbumes es de Deftones?", c:[
+      { t:"White Pony 🤍🐎", n:4 }, { t:"El que se siente como abrazo 🌧️", n:4 }
+    ]},
+    { t:"Misión romántica 💞", p:"Completa la frase: Contigo, lo simple se siente…", c:[
+      { t:"Especial ✨", n:5 }, { t:"Seguro 🫶", n:5 }, { t:"Como hogar 🏡", n:5 }
+    ]},
+    { final:true }
+  ];
 
-function go(i){
-  const s=steps[i];
-  btns.innerHTML="";
-  hint.textContent="";
+  function musicToggle(i){
+    const b = document.createElement("button");
+    b.className = "ghost";
+    b.textContent = bgm.paused ? "🔊 Música ON" : "🔇 Música OFF";
+    b.onclick = () => {
+      if (bgm.paused) bgm.play(); else bgm.pause();
+      go(i);
+    };
+    return b;
+  }
 
-  if(s.final){
-    title.textContent="💖";
-    text.innerHTML=`
-      <div class="final">Darenka, ¿quieres ser mi novia?</div>
+  function go(i){
+    const s = steps[i];
+    btns.innerHTML = "";
 
-      <div class="message">
-        <p><strong>Darenka,</strong></p>
+    if (s.final){
+      title.textContent = "💖";
+      hint.textContent = "";
+      text.innerHTML = `
+        <div class="final">Darenka, ¿quieres ser mi novia?</div>
 
-        <p>
-          no hice este juego para impresionarte,<br>
-          lo hice porque contigo me nacen ganas de crear,<br>
-          de cuidarte, de elegirte con calma y con intención.
-        </p>
+        <div class="message">
+          <p><strong>Darenka,</strong></p>
 
-        <p>
-          Me gusta cómo se siente hablar contigo,<br>
-          cómo la música suena distinto cuando estás cerca,<br>
-          y cómo lo simple se vuelve especial si es contigo.
-        </p>
+          <p>
+            no hice este juego para impresionarte,<br>
+            lo hice porque contigo me nacen ganas de crear,<br>
+            de cuidarte, de elegirte con calma y con intención.
+          </p>
 
-        <p>
-          No prometo perfección,<br>
-          pero sí presencia, respeto y ganas reales de construir algo bonito.
-        </p>
+          <p>
+            Me gusta cómo se siente hablar contigo,<br>
+            cómo la música suena distinto cuando estás cerca,<br>
+            y cómo lo simple se vuelve especial si es contigo.
+          </p>
 
-        <p><strong>Si me dejas, quiero ser tu lugar seguro.</strong></p
+          <p>
+            No prometo perfección,<br>
+            pero sí presencia, respeto y ganas reales de construir algo bonito.
+          </p>
 
+          <p><strong>Si me dejas, quiero ser tu lugar seguro.</strong></p>
+        </div>
+      `;
+
+      const yes = document.createElement("button");
+      yes.className = "primary";
+      yes.textContent = "Sí 💕";
+      yes.onclick = () => hearts(30);
+
+      const no = document.createElement("button");
+      no.className = "ghost";
+      no.textContent = "No 🙈";
+      no.onmouseover = () => {
+        no.style.transform = "translate(" + (Math.random()*160 - 80) + "px)";
+      };
+
+      btns.appendChild(musicToggle(i));
+      btns.appendChild(yes);
+      btns.appendChild(no);
+      hearts(22);
+      return;
+    }
+
+    title.textContent = s.t;
+    text.textContent = s.p;
+    hint.textContent = "";
+
+    btns.appendChild(musicToggle(i));
+
+    s.c.forEach(opt=>{
+      const b = document.createElement("button");
+      b.className = "primary";
+      b.textContent = opt.t;
+      b.onclick = () => { hearts(8); go(opt.n); };
+      btns.appendChild(b);
+    });
+  }
+
+  // 🎵 botón música principal
+  document.getElementById("musicBtn").onclick = async () => {
+    if(!audioUnlocked){
+      alert("Toca una vez la pantalla y vuelve a presionar 💗");
+      return;
+    }
+    try{
+      bgm.currentTime = 0;
+      await bgm.play();
+      hearts(10);
+    }catch(e){
+      alert("Sube el volumen o revisa que la pestaña no esté en silencio 🔊");
+    }
+  };
+
+  document.getElementById("startBtn").onclick = () => {
+    hearts(8);
+    go(0);
+  };
+</script>
+</body>
+</html>
